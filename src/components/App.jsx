@@ -1,23 +1,54 @@
 class App extends React.Component {
   constructor(props) {
     super(props);
-    searchYouTube({ query: 'flowers', max: 5, key: YOUTUBE_API_KEY }, data => {
-      console.log('data: ', data);
-      this.currentVideo = data[0];
-      this.videos = data;
-    });
     this.state = {
-      currentVideo: this.currentVideo,
-      videos: this.videos
+      videos: exampleVideoData,
+      currentVideo: exampleVideoData[0],
+      defaultSearch: {
+        query: 'hack reactor',
+        max: 5,
+        key: YOUTUBE_API_KEY
+      },
+      autoPlay: false
     };
+    searchYouTube(this.state.defaultSearch, data => {
+      this.setState({
+        videos: data,
+        currentVideo: data[0]
+      });
+    });
     this.onTitleClick = this.onTitleClick.bind(this);
     this.searchClick = this.searchClick.bind(this);
     this.keyUp = this.keyUp.bind(this);
+    this.autoPlay = this.autoPlay.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.currentVideo !== nextState.currentVideo) {
+      return true;
+    }
+    if (this.state.videos !== nextState.videos) {
+      return true;
+    }
+    return false;
+  }
+
+  autoPlay(e) {
+    if (this.state.autoPlay) {
+      this.setState({
+        autoPlay: false
+      });
+    } else {
+      this.setState({
+        autoPlay: true
+      });
+    }
   }
 
   searchClick(e) {
     let search = document.getElementsByClassName('searchBar')[0].value;
-    searchYouTube({ query: search, max: 5, key: YOUTUBE_API_KEY }, data => {
+    let defaultSearch = { query: search, max: 5, key: YOUTUBE_API_KEY };
+    searchYouTube(defaultSearch, data => {
       this.setState({
         videos: data,
         currentVideo: data[0]
@@ -45,7 +76,12 @@ class App extends React.Component {
       <div>
         <Nav search={this.searchClick} keyUp={this.keyUp}/>
         <div className="col-md-7">
-          <VideoPlayer video={this.state.currentVideo}/>
+          <label>
+            <div>Auto Play
+              <input onClick={this.autoPlay} type="checkbox"></input>
+            </div>
+          </label>
+          <VideoPlayer video={this.state.currentVideo} auto={this.state.autoPlay} />
         </div>
         <div className="col-md-5">
           <VideoList videos={this.state.videos} click={this.onTitleClick}/>

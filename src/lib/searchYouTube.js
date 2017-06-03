@@ -1,7 +1,7 @@
 var searchYouTube = (options, callback) => {
   // TODO
   let urlAPI = 'https://www.googleapis.com/youtube/v3/search';
-  console.log('called');
+
   $.ajax({
     cache: false,
     data: $.extend({
@@ -13,8 +13,6 @@ var searchYouTube = (options, callback) => {
     type: 'GET',
     url: urlAPI,
     success: function (data) {
-      console.log('success');
-      console.log(callback);
       return callback(data.items);
     },
     error: function (data) {
